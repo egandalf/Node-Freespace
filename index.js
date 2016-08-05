@@ -23,8 +23,12 @@ var fsFreeSpace = function(){
     return new promise(function(fulfill, reject){
         var command = "diskutil info disk1";
         child = exec(command, function(error, stdout, stderr){
-            console.log("StdErr: " + stderr);
-            console.log("Error: " + error);
+            if(error){
+                reject(error);
+            }
+            if(stderr.length > 0){
+                reject(stderr);
+            }
             readOutput(stdout).then(function(result) { fulfill(result); });
         });
     });
@@ -37,6 +41,7 @@ var readOutput = function (stdout) {
             if(element.trim().indexOf('Volume Free Space') == 0){
                 fulfill(element.trim());
             }
+            reject("Volume Free Space not found!");
         }, this);
     })
 }
