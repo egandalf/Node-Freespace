@@ -12,6 +12,9 @@ app.get('/free', function(req, res){
             function(output) {
                 res.append("Content-Type", "text/plain");
                 res.send(output);
+            },
+            function(info) {
+                res.status(500).send(info);
             });
 });
 
@@ -23,13 +26,17 @@ var fsFreeSpace = function(){
     return new promise(function(fulfill, reject){
         var command = "diskutil info disk1";
         child = exec(command, function(error, stdout, stderr){
+            //stderr = "Command not found.";
+            //error = "WTF!";
             if(error){
-                reject(error);
+                reject("Error: Could not issue the command.");
+                console.error(error);
             }
             if(stderr.length > 0){
-                reject(stderr);
+                reject("Error: Command returned an error.");
+                console.error(stderr);
             }
-            readOutput(stdout).then(function(result) { fulfill(result); });
+            readOutput(stdout).then(function(result) { fulfill(result); }, function(info){ reject(info); });
         });
     });
 };
@@ -41,7 +48,7 @@ var readOutput = function (stdout) {
             if(element.trim().indexOf('Volume Free Space') == 0){
                 fulfill(element.trim());
             }
-            reject("Volume Free Space not found!");
         }, this);
+        reject("Volume Free Space not found!");
     })
 }
