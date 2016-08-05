@@ -29,12 +29,12 @@ var fsFreeSpace = function(){
             //stderr = "Command not found.";
             //error = "WTF!";
             if(error){
-                reject("Error: Could not issue the command.");
                 console.error(error);
+                reject("Error: Could not issue the command.");
             }
             if(stderr.length > 0){
-                reject("Error: Command returned an error.");
                 console.error(stderr);
+                reject("Error: Command returned an error.");
             }
             readOutput(stdout).then(function(result) { fulfill(result); }, function(info){ reject(info); });
         });
@@ -49,6 +49,8 @@ var readOutput = function (stdout) {
                 fulfill(element.trim());
             }
         }, this);
+        console.error("Error with stdout - Volume Free Space not found!");
+        console.error(stdout);
         reject("Volume Free Space not found!");
     })
 }
